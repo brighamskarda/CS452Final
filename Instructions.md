@@ -15,3 +15,13 @@ Run `docker run -d --name redis-stack -p 6379:6379 -p 8001:8001 redis/redis-stac
 ## Postgres
 
 Run `docker run --name some-postgres -e POSTGRES_PASSWORD=mysecretpassword -e POSTGRES_DB=wiki-db -d -p 5432:5432 postgres`
+
+Connect to the database (I use pgAdmin) and run the following sql to set up the table that will be needed.
+
+```sql
+CREATE TABLE IF NOT EXISTS public.article
+(
+    title TEXT PRIMARY KEY,
+    links TEXT[]
+);
+```
