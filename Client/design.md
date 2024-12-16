@@ -13,6 +13,8 @@
 
 Titles should be the last part of the href path. For example Adolf Hitlers database title is Adolf_Hitler and can be found at `/html/head/link[2]`
 
+Cached paths should be `fromTitle->toTitle
+
 ## Search Algorithm Details
 
 struct node {article title, child_nodes}

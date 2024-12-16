@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-
-	"example.com/cs465final/wikicalls"
 )
 
 func main() {
@@ -16,17 +14,21 @@ func main() {
 	for {
 		fromArticleTitle, toArticleTitle := promptUserForArticles()
 
-		fromArticle, err := wikicalls.GetArticleWiki(fromArticleTitle)
+		fromArticle, err := GetArticleWiki(fromArticleTitle)
 		if err != nil {
 			fmt.Println("Couldn't find article titled ", fromArticleTitle)
 			continue
 		}
-		toArticle, err := wikicalls.GetArticleWiki(toArticleTitle)
+		toArticle, err := GetArticleWiki(toArticleTitle)
 		if err != nil {
 			fmt.Println("Couldn't find article titled ", fromArticleTitle)
 			continue
 		}
-		fmt.Println(fromArticle, toArticle.Title)
+
+		if cachedValue := CheckRedisCache(fromArticle.Title, toArticle.Title); cachedValue != "" {
+			fmt.Print("Found cached path: \033[1m" + cachedValue + "\033[0m\n\n")
+			continue
+		}
 	}
 }
 

@@ -1,4 +1,4 @@
-package wikicalls
+package main
 
 import (
 	"fmt"
