@@ -2,10 +2,10 @@
 
 1. Ask user for first article
 2. Ask user for second article
-3. Check Redis Cache
-   1. If in cache then we are done
-4. Make sure articles exist
+3. Make sure articles exist
    1. Call API (It does some nice filtering)
+4. Check Redis Cache
+   1. If in cache then we are done
 5. If articles don't exits then reprompt user for article names
 6. If articles do exist then start breadth first search until a path is found.
 
@@ -47,7 +47,7 @@ func apiRequestProcessor(bufferedChannel(request))
 
 ## HTML parsing notes
 
- * Look only in this element //*[@id="content"]
- * Look at 'href="/wiki/'
- * Do not look at href="/wiki/File
- * Be sure to filter out duplicates
+* Look at 'href="/wiki/'
+* Do not look at href="/wiki/File
+* Be sure to filter out duplicates
+* The current article title can be found in the content-location header
