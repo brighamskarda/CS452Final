@@ -7,9 +7,13 @@ import (
 	"os"
 	"slices"
 	"strings"
+	"time"
 
 	"golang.org/x/net/html"
 )
+
+const apiUserAgent = "brighamskarda@gmail.com"
+const apiRequestSec = 190
 
 type Article struct {
 	Title string
@@ -22,7 +26,7 @@ func GetArticleWiki(title string) (Article, error) {
 		fmt.Fprint(os.Stderr, "Error forming request in GetArticleWiki\n")
 		return Article{}, err
 	}
-	request.Header.Add("User-Agent", "brighamskarda@gmail.com")
+	request.Header.Add("User-Agent", apiUserAgent)
 
 	response, err := http.DefaultClient.Do(request)
 	if err != nil {
@@ -60,6 +64,10 @@ func getArticleLinks(body io.ReadCloser) []string {
 		}
 	}
 
+	// Remove duplicates
+	slices.Sort(links)
+	links = slices.Compact(links)
+
 	return links
 }
 
@@ -74,4 +82,25 @@ func getLink(node *html.Node) string {
 		}
 	}
 	return ""
+}
+
+type apiRequest struct {
+	title         string
+	returnChannel chan Article
+}
+
+func ApiRequestProcessor(requests chan apiRequest) {
+	for {
+		for i := len(requests); i > 0; i-- {
+			request := <-requests
+			go func(title string, ch chan Article) {
+				art, err := GetArticleWiki(title)
+				if err != nil {
+					fmt.Fprint(os.Stderr, "failed to get article titled "+title+" in ApiRequestProcessor\n")
+				}
+				ch <- art
+			}(request.title, request.returnChannel)
+		}
+		time.Sleep(time.Second)
+	}
 }
