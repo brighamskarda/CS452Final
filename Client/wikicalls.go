@@ -12,7 +12,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-const apiUserAgent = "brighamskarda@gmail.com"
+const apiUserAgent = "--@gmail.com"
 const apiRequestSec = 190
 
 type Article struct {

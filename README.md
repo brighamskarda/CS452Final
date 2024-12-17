@@ -25,3 +25,11 @@ CREATE TABLE IF NOT EXISTS public.article
     links TEXT[]
 );
 ```
+
+## Build Instructions
+
+To build and run the project navigate to the client directory and run `go build` or `go run .`
+
+Please also consider putting your email into the wikicalls.go file (in the variable named apiUserAgent). This will
+allow wikipedia to contact you if for some reason the program causing them an issue. Do not increase the apiRequestSec!
+Wikipedia requests that any single agent makes less than 200 calls per second.
