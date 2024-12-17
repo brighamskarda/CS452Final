@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"os"
 
 	"github.com/jackc/pgx/v5"
@@ -22,8 +23,7 @@ func GetArticlesPostgres(titles []string) []Article {
 	articles := make([]Article, len(titles))
 	for i, title := range titles {
 		row := conn.QueryRow(context.Background(), query, title)
-		articles[i].Title = title
-		if row.Scan(articles[i].Links) != nil {
+		if err := row.Scan(&articles[i].Title, &articles[i].Links); err != nil {
 			articles[i].Title = ""
 			articles[i].Links = nil
 		}
@@ -45,7 +45,7 @@ func InsertArticlesPostgres(articles []Article) {
 	for _, article := range articles {
 		commandTag, err := conn.Exec(context.Background(), query, article.Title, article.Links)
 		if err != nil || commandTag.RowsAffected() != 1 {
-			fmt.Fprintln(os.Stderr, "Error inserting row in PostArticlesPostgres.")
+			slog.Debug(fmt.Sprintf("Could not insert article into postgres: %v", article.Title))
 		}
 	}
 }

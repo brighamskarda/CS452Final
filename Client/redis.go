@@ -22,3 +22,16 @@ func CheckRedisCache(fromArticle string, toArticle string) string {
 	}
 	return val
 }
+
+func InsertRedisCache(key string, value string) {
+	client := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "", // No password set
+		DB:       0,  // Use default DB
+		Protocol: 2,  // Connection protocol
+	})
+
+	ctx := context.Background()
+
+	client.Set(ctx, key, value, 0)
+}

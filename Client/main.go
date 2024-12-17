@@ -40,6 +40,7 @@ func main() {
 		}
 
 		fmt.Print("Found path: \033[1m" + path + "\033[0m\n\n")
+		InsertRedisCache(fromArticle.Title+"->"+toArticle.Title, path)
 	}
 }
 
@@ -80,7 +81,7 @@ const bfsMaxDepth = 6
 
 func BreadthFirstSearch(fromArticle Article, toArticle Article) string {
 	requestChannel := make(chan apiRequest, apiRequestSec)
-	ApiRequestProcessor(requestChannel)
+	go ApiRequestProcessor(requestChannel)
 
 	parentNode := &BfsNode{
 		title:    fromArticle.Title,
@@ -91,10 +92,16 @@ func BreadthFirstSearch(fromArticle Article, toArticle Article) string {
 		parentNode.children = append(parentNode.children, &BfsNode{
 			title:    link,
 			children: nil})
+		if link == toArticle.Title {
+			return fromArticle.Title + "->" + toArticle.Title
+		}
 	}
 
 	for depthToSearch := 0; depthToSearch <= bfsMaxDepth; depthToSearch++ {
 		if result := search(parentNode, requestChannel, depthToSearch, toArticle.Title); result != "" {
+			if depthToSearch == 0 {
+				return parentNode.title + "->" + result
+			}
 			return result
 		}
 	}
@@ -107,7 +114,7 @@ func search(node *BfsNode, requestChan chan apiRequest, depth int, toArticle str
 	if depth != 0 {
 		for _, child := range node.children {
 			if result := search(child, requestChan, depth-1, toArticle); result != "" {
-				return node.title + "->" + result
+				return node.title + "->" + child.title + "->" + result
 			}
 		}
 		return ""
@@ -125,7 +132,7 @@ func search(node *BfsNode, requestChan chan apiRequest, depth int, toArticle str
 		for _, link := range articles[i].Links {
 			grandChildren = append(grandChildren, &BfsNode{title: link, children: nil})
 			if link == toArticle {
-				return link
+				return child.title + "->" + link
 			}
 		}
 		child.children = grandChildren
